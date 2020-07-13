@@ -9,6 +9,7 @@ class SocksProxy(StreamRequestHandler):
         # 协商
         # 从客户端读取并解包两个字节的数据
         header = self.connection.recv(2)
+        print('connection header {}'.format(header))
         version, nmethods = struct.unpack("!BB", header)
         # 设置socks5协议，METHODS字段的数目大于0
         assert version == SOCKS_VERSION
@@ -73,10 +74,18 @@ class SocksProxy(StreamRequestHandler):
             r, w, e = select.select([client, remote], [], [])
             if client in r:
                 data = client.recv(4096)
+                print("---------client: ")
+                print(data)
+                print("---------end: ")
+                print("\n\n\n")
                 if remote.send(data) <= 0:
                     break
             if remote in r:
                 data = remote.recv(4096)
+                print("=========remote: ")
+                print(data)
+                print("---------end: ")
+                print("\n\n\n")
                 if client.send(data) <= 0:
                     break
 if __name__ == '__main__':
