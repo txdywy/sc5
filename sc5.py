@@ -33,6 +33,7 @@ class SocksProxy(StreamRequestHandler):
             address_pkg = self.connection.recv(4)
             address = socket.inet_ntoa(address_pkg)
             print('connection address_type == 1 address_pkg {}'.format(address_pkg))
+            print('connection address {}'.format(address))
         elif address_type == 3:  # Domain name
             domain_length = self.connection.recv(1)[0]
             address = self.connection.recv(domain_length)
@@ -99,5 +100,5 @@ class SocksProxy(StreamRequestHandler):
                     break
 if __name__ == '__main__':
     # 使用socketserver库的多线程服务器ThreadingTCPServer启动代理
-    with ThreadingTCPServer(('127.0.0.1', 9011), SocksProxy) as server:
+    with ThreadingTCPServer(('0.0.0.0', 9011), SocksProxy) as server:
         server.serve_forever()
