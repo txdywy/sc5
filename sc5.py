@@ -21,23 +21,32 @@ class SocksProxy(StreamRequestHandler):
             self.server.close_request(self.request)
             return
         # 发送协商响应数据包
-        self.connection.sendall(struct.pack("!BB", SOCKS_VERSION, 0))
+        send_pkg = struct.pack("!BB", SOCKS_VERSION, 0)
+        print('connection send_pkg {}'.format(send_pkg))
+        self.connection.sendall(send_pkg)
         # 请求
-        version, cmd, _, address_type = struct.unpack("!BBBB", self.connection.recv(4))
+        recv_pkg = self.connection.recv(4)
+        version, cmd, _, address_type = struct.unpack("!BBBB", recv_pkg)
+        print('connection recv_pkg {}'.format(recv_pkg))
         assert version == SOCKS_VERSION
         if address_type == 1:  # IPv4
-            address = socket.inet_ntoa(self.connection.recv(4))
+            address_pkg = self.connection.recv(4)
+            address = socket.inet_ntoa(address_pkg)
+            print('connection address_type == 1 address_pkg {}'.format(address_pkg))
         elif address_type == 3:  # Domain name
             domain_length = self.connection.recv(1)[0]
             address = self.connection.recv(domain_length)
+            print('connection address_type == 3 domain_length {} address {}'.format(domain_length, address))
             #address = socket.gethostbyname(address.decode("UTF-8"))  # 将域名转化为IP，这一行可以去掉
         elif address_type == 4: # IPv6
             addr_ip = self.connection.recv(16)
             address = socket.inet_ntop(socket.AF_INET6, addr_ip)
+            print('connection address_type == 4 ipv6 addr_ip {} address {}'.format(addr_ip, address))
         else:
             self.server.close_request(self.request)
             return
         port = struct.unpack('!H', self.connection.recv(2))[0]
+        print('connection port {}'.format(port))
         # 响应，只支持CONNECT请求
         try:
             if cmd == 1:  # CONNECT
