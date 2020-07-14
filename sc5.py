@@ -1,6 +1,7 @@
 import select
 import socket
 import struct
+import logging
 from socketserver import StreamRequestHandler, ThreadingTCPServer
 SOCKS_VERSION = 5
 class SocksProxy(StreamRequestHandler):
